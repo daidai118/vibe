@@ -143,4 +143,4 @@ scripts/
 
 ## License
 
-未指定。使用、修改或分发前请先确认授权方式。
+MIT License. See [LICENSE](LICENSE) for details.
