@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Vibe</string>
+    <key>CFBundleDisplayName</key>
+    <string>Vibe</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.daidai.vibe</string>
+    <key>CFBundleExecutable</key>
+    <string>Vibe</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.4</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>Vibe 需要捕获各应用的音频,以便实现单应用音量控制、静音、输出路由和实时音效增强。</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2026 daidai</string>
+</dict>
+</plist>
