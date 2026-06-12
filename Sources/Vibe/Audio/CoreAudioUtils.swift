@@ -22,11 +22,13 @@ enum CA {
         AudioObjectPropertyAddress(mSelector: selector, mScope: scope, mElement: element)
     }
 
-    /// 读取定长属性
+    /// 读取定长属性(仅用于 POD 类型:UInt32 / Double / AudioDeviceID / pid_t 等)
     static func get<T>(_ object: AudioObjectID, _ address: AudioObjectPropertyAddress, _ value: inout T) -> OSStatus {
         var address = address
         var size = UInt32(MemoryLayout<T>.size)
-        return AudioObjectGetPropertyData(object, &address, 0, nil, &size, &value)
+        return withUnsafeMutablePointer(to: &value) { ptr in
+            AudioObjectGetPropertyData(object, &address, 0, nil, &size, ptr)
+        }
     }
 
     /// 读取 CFString 属性

@@ -44,6 +44,15 @@ struct EffectsView: View {
                 }
 
                 EffectCard(
+                    title: "水晶人声",
+                    subtitle: "3.2kHz 亮度 + 11kHz 空气感,透亮不刺耳",
+                    enabled: binding(\.crystalEnabled)
+                ) {
+                    ParamSlider(label: "亮度", value: binding(\.crystalAmount), range: 0...1)
+                    ParamSlider(label: "气感", value: binding(\.crystalAir), range: 0...1)
+                }
+
+                EffectCard(
                     title: "空间环绕(SRS 风格)",
                     subtitle: "拓宽声场,低音保持居中不发散",
                     enabled: binding(\.spatialEnabled)

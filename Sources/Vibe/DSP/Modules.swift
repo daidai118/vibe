@@ -139,6 +139,41 @@ final class ClarityExciter {
     }
 }
 
+// MARK: - 水晶人声(Crystal Voice)
+// 原理:3.2kHz 临场峰提亮人声 + 300Hz 轻微衰减去浑浊 + 11kHz "空气感"高架。
+// 刻意避开 6–8kHz 齿音区,人声透亮如水晶又不刺耳。
+
+final class CrystalVoice {
+    private let sampleRate: Float
+    private var presenceCoef = BiquadCoeffs.identity
+    private var mudCoef = BiquadCoeffs.identity
+    private var airCoef = BiquadCoeffs.identity
+    private var presenceState = [BiquadState](repeating: BiquadState(), count: 2)
+    private var mudState = [BiquadState](repeating: BiquadState(), count: 2)
+    private var airState = [BiquadState](repeating: BiquadState(), count: 2)
+    private var mudActive = false
+
+    init(sampleRate: Float) { self.sampleRate = sampleRate }
+
+    func update(amount: Float, air: Float) {
+        let a = max(0, min(1, amount))
+        let airA = max(0, min(1, air))
+        presenceCoef = .peaking(freq: 3200, q: 1.0, gainDB: a * 4.5, sampleRate: sampleRate)
+        mudCoef = .peaking(freq: 300, q: 1.0, gainDB: -a * 2.0, sampleRate: sampleRate)
+        airCoef = .highShelf(freq: 11000, gainDB: airA * 5.5, sampleRate: sampleRate)
+        mudActive = a > 0.05
+    }
+
+    func process(_ buf: UnsafeMutablePointer<Float>, _ count: Int, channel: Int) {
+        let ch = channel
+        presenceState[ch].process(buf, count, presenceCoef)
+        if mudActive {
+            mudState[ch].process(buf, count, mudCoef)
+        }
+        airState[ch].process(buf, count, airCoef)
+    }
+}
+
 // MARK: - 空间环绕(SRS 风格)
 // 原理:M/S 分解,放大 Side 并对其高频增亮;Side 低于 180Hz 高通,
 //       低音保持单声道居中,既宽又不散

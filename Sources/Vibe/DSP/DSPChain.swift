@@ -10,7 +10,7 @@ struct RenderParams {
 }
 
 /// 每个被接管应用一条 DSP 链。
-/// 信号链:EQ → 动感响度 → 清晰度激励 → 纯净低音 → 空间环绕 → 临场感 → 应用音量 → 限幅保护
+/// 信号链:EQ → 动感响度 → 清晰度激励 → 水晶人声 → 纯净低音 → 空间环绕 → 临场感 → 应用音量 → 限幅保护
 ///
 /// 线程模型:UI 线程通过 set* 写入参数(加锁 + 版本号);
 /// 渲染线程每个回调用 trylock 拿快照,拿不到就沿用上次的,绝不阻塞音频线程。
@@ -32,6 +32,7 @@ final class DSPChain {
     private let eq: GraphicEQ
     private let loudness: LoudnessContour
     private let clarity: ClarityExciter
+    private let crystal: CrystalVoice
     private let bass: BassEnhancer
     private let spatial: SpatialWidener
     private let reverb: ConcertReverb
@@ -51,6 +52,7 @@ final class DSPChain {
         eq = GraphicEQ(sampleRate: sr)
         loudness = LoudnessContour(sampleRate: sr)
         clarity = ClarityExciter(sampleRate: sr)
+        crystal = CrystalVoice(sampleRate: sr)
         bass = BassEnhancer(sampleRate: sr)
         spatial = SpatialWidener(sampleRate: sr)
         reverb = ConcertReverb(sampleRate: sr)
@@ -219,6 +221,7 @@ final class DSPChain {
         eq.update(gains: e.eqGains, preampDB: e.eqPreamp)
         loudness.update(amount: e.loudnessAmount)
         clarity.update(amount: e.clarityAmount, lowContourDB: e.clarityLowContour)
+        crystal.update(amount: e.crystalAmount, air: e.crystalAir)
         bass.update(amount: e.bassAmount, frequency: e.bassFrequency)
         spatial.update(width: e.spatialWidth, brightness: e.spatialBrightness)
         reverb.update(amount: e.concertAmount, size: e.concertSize)
@@ -239,6 +242,10 @@ final class DSPChain {
         if e.clarityEnabled {
             clarity.process(scratchL, n, channel: 0)
             clarity.process(scratchR, n, channel: 1)
+        }
+        if e.crystalEnabled {
+            crystal.process(scratchL, n, channel: 0)
+            crystal.process(scratchR, n, channel: 1)
         }
         if e.bassEnabled {
             bass.process(scratchL, n, channel: 0)
